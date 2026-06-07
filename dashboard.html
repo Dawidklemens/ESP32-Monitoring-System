@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard ESP32</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; }
+        .box { border: 1px solid #333; padding: 20px; display: inline-block; margin: 10px; border-radius: 10px; }
+        #status { color: yellow; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>System ESP32 Online</h1>
+    <div id="status">Łączenie...</div>
+    
+    <div class="box">
+        <h3>Temperatura</h3>
+        <div id="temp" style="font-size: 40px; color: red;">-- °C</div>
+    </div>
+    
+    <div class="box">
+        <h3>Wilgotność</h3>
+        <div id="hum" style="font-size: 40px; color: cyan;">-- %</div>
+    </div>
+
+    <script>
+        // Automatyczne wykrywanie adresu serwera
+        const host = window.location.hostname === "10.0.2.2" ? "10.0.2.2" : "localhost";
+        
+        function pobierzDane() {
+            fetch(`http://${host}/select.php`)
+                .then(res => res.json())
+                .then(data => {
+                    const d = data[0];
+                    document.getElementById('temp').innerText = d.temperature + " °C";
+                    document.getElementById('hum').innerText = d.humidity + " %";
+                    document.getElementById('status').innerText = "STATUS: ONLINE";
+                    document.getElementById('status').style.color = "#0f0";
+                })
+                .catch(err => {
+                    document.getElementById('status').innerText = "BŁĄD: Sprawdź serwer";
+                    document.getElementById('status').style.color = "red";
+                });
+        }
+        setInterval(pobierzDane, 3000);
+        pobierzDane();
+    </script>
+</body>
+</html>
